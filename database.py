@@ -1,90 +1,156 @@
-import sqlite3
 import os
+import sqlite3
 
-_dir = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(_dir, 'taller.db')
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+# ─── PostgreSQL (Render) ──────────────────────────────────────────────────────
+if DATABASE_URL:
+    import psycopg2
+    import psycopg2.extras
 
-def init_db():
-    conn = get_db()
-    c = conn.cursor()
+    def get_db():
+        conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+        return conn
 
-    c.executescript('''
-        CREATE TABLE IF NOT EXISTS clientes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            apellido TEXT NOT NULL,
-            direccion TEXT,
-            telefono TEXT,
-            email TEXT,
-            dni TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+    def init_db():
+        conn = get_db()
+        c = conn.cursor()
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS clientes (
+                id SERIAL PRIMARY KEY,
+                nombre TEXT NOT NULL,
+                apellido TEXT NOT NULL,
+                direccion TEXT,
+                telefono TEXT,
+                email TEXT,
+                dni TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS vehiculos (
+                id SERIAL PRIMARY KEY,
+                marca TEXT NOT NULL,
+                modelo TEXT NOT NULL,
+                patente TEXT NOT NULL UNIQUE,
+                anio INTEGER,
+                motor TEXT,
+                vin TEXT,
+                color TEXT,
+                combustible TEXT,
+                cliente_id INTEGER REFERENCES clientes(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS ordenes (
+                id SERIAL PRIMARY KEY,
+                vehiculo_id INTEGER NOT NULL REFERENCES vehiculos(id),
+                cliente_id INTEGER NOT NULL REFERENCES clientes(id),
+                fecha_ingreso DATE NOT NULL,
+                fecha_estimada DATE,
+                fecha_egreso DATE,
+                kilometros INTEGER,
+                receptor_servicio TEXT,
+                descripcion_trabajo TEXT,
+                diagnostico TEXT,
+                repuestos TEXT,
+                observaciones TEXT,
+                estado TEXT DEFAULT 'abierta',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS presupuestos (
+                id SERIAL PRIMARY KEY,
+                cliente_id INTEGER NOT NULL REFERENCES clientes(id),
+                vehiculo_id INTEGER REFERENCES vehiculos(id),
+                fecha DATE NOT NULL,
+                valido_hasta DATE,
+                descripcion TEXT,
+                observaciones TEXT,
+                atendido_por TEXT,
+                condicion_venta TEXT,
+                estado TEXT DEFAULT 'pendiente',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS presupuesto_items (
+                id SERIAL PRIMARY KEY,
+                presupuesto_id INTEGER NOT NULL REFERENCES presupuestos(id),
+                tipo TEXT NOT NULL,
+                descripcion TEXT NOT NULL,
+                cantidad REAL DEFAULT 1,
+                precio_unitario REAL DEFAULT 0,
+                en_stock INTEGER DEFAULT 0
+            )
+        ''')
+        conn.commit()
+        conn.close()
 
-        CREATE TABLE IF NOT EXISTS vehiculos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            marca TEXT NOT NULL,
-            modelo TEXT NOT NULL,
-            patente TEXT NOT NULL UNIQUE,
-            anio INTEGER,
-            motor TEXT,
-            vin TEXT,
-            color TEXT,
-            combustible TEXT,
-            cliente_id INTEGER,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-        );
+# ─── SQLite (local) ───────────────────────────────────────────────────────────
+else:
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    DB_PATH = os.path.join(_dir, 'taller.db')
 
-        CREATE TABLE IF NOT EXISTS ordenes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            vehiculo_id INTEGER NOT NULL,
-            cliente_id INTEGER NOT NULL,
-            fecha_ingreso DATE NOT NULL,
-            fecha_estimada DATE,
-            fecha_egreso DATE,
-            kilometros INTEGER,
-            receptor_servicio TEXT,
-            descripcion_trabajo TEXT,
-            diagnostico TEXT,
-            repuestos TEXT,
-            observaciones TEXT,
-            estado TEXT DEFAULT 'abierta',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id),
-            FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-        );
+    class SqliteRow(dict):
+        """Hace que las filas de SQLite se comporten como dict y soporten acceso por índice."""
+        def __getitem__(self, key):
+            return super().__getitem__(key)
 
-        CREATE TABLE IF NOT EXISTS presupuestos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente_id INTEGER NOT NULL,
-            vehiculo_id INTEGER,
-            fecha DATE NOT NULL,
-            valido_hasta DATE,
-            descripcion TEXT,
-            observaciones TEXT,
-            atendido_por TEXT,
-            condicion_venta TEXT,
-            estado TEXT DEFAULT 'pendiente',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (cliente_id) REFERENCES clientes(id),
-            FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id)
-        );
+    def get_db():
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        return conn
 
-        CREATE TABLE IF NOT EXISTS presupuesto_items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            presupuesto_id INTEGER NOT NULL,
-            tipo TEXT NOT NULL,
-            descripcion TEXT NOT NULL,
-            cantidad REAL DEFAULT 1,
-            precio_unitario REAL DEFAULT 0,
-            en_stock INTEGER DEFAULT 0,
-            FOREIGN KEY (presupuesto_id) REFERENCES presupuestos(id)
-        );
-    ''')
-    conn.commit()
-    conn.close()
+    def init_db():
+        conn = get_db()
+        c = conn.cursor()
+        c.executescript('''
+            CREATE TABLE IF NOT EXISTS clientes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL, apellido TEXT NOT NULL,
+                direccion TEXT, telefono TEXT, email TEXT, dni TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS vehiculos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                marca TEXT NOT NULL, modelo TEXT NOT NULL,
+                patente TEXT NOT NULL UNIQUE, anio INTEGER,
+                motor TEXT, vin TEXT, color TEXT, combustible TEXT,
+                cliente_id INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            );
+            CREATE TABLE IF NOT EXISTS ordenes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                vehiculo_id INTEGER NOT NULL, cliente_id INTEGER NOT NULL,
+                fecha_ingreso DATE NOT NULL, fecha_estimada DATE, fecha_egreso DATE,
+                kilometros INTEGER, receptor_servicio TEXT,
+                descripcion_trabajo TEXT, diagnostico TEXT, repuestos TEXT,
+                observaciones TEXT, estado TEXT DEFAULT 'abierta',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id),
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            );
+            CREATE TABLE IF NOT EXISTS presupuestos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                cliente_id INTEGER NOT NULL, vehiculo_id INTEGER,
+                fecha DATE NOT NULL, valido_hasta DATE,
+                descripcion TEXT, observaciones TEXT,
+                atendido_por TEXT, condicion_venta TEXT,
+                estado TEXT DEFAULT 'pendiente',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+                FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id)
+            );
+            CREATE TABLE IF NOT EXISTS presupuesto_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                presupuesto_id INTEGER NOT NULL, tipo TEXT NOT NULL,
+                descripcion TEXT NOT NULL, cantidad REAL DEFAULT 1,
+                precio_unitario REAL DEFAULT 0, en_stock INTEGER DEFAULT 0,
+                FOREIGN KEY (presupuesto_id) REFERENCES presupuestos(id)
+            );
+        ''')
+        conn.commit()
+        conn.close()
