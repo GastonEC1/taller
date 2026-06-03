@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Orden de Reparación #{{ orden.id }}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:9.5px;color:#000;background:#fff}
+    .page{width:210mm;margin:0 auto;padding:7mm 9mm}
+
+    /* ── HEADER ── */
+    .header{display:grid;grid-template-columns:1fr 90px 1fr;border:1px solid #000}
+    .h-left{padding:7px 9px;border-right:1px solid #000}
+    .h-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;
+           border-right:1px solid #000;padding:4px;text-align:center}
+    .h-right{padding:7px 9px;position:relative}
+    .pagina{position:absolute;top:4px;right:6px;font-size:8px;color:#555}
+    .taller-name{font-size:12px;font-weight:bold;margin-bottom:3px}
+    .taller-sub{font-size:8.5px;line-height:1.6}
+    .x-box{font-size:26px;font-weight:bold;border:1px solid #000;
+           width:38px;height:38px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+    .doc-no-factura{font-size:9px;font-weight:bold;margin-bottom:2px}
+    .doc-titulo{font-size:11px;font-weight:bold;margin-bottom:5px}
+    .doc-row{display:flex;gap:4px;font-size:8.5px;margin-bottom:2px}
+    .doc-row .lbl{font-weight:bold;min-width:55px}
+
+    /* ── IVA BAR ── */
+    .iva-bar{text-align:center;font-size:10px;font-weight:bold;
+             border:1px solid #000;border-top:none;padding:3px;letter-spacing:1px}
+
+    /* ── GRILLA PRINCIPAL ── */
+    .data-table{width:100%;border-collapse:collapse;border:1px solid #000;border-top:none}
+    .data-table td{border:1px solid #aaa;padding:2px 5px;font-size:8.5px;vertical-align:middle;height:16px}
+    .data-table td.lbl{font-weight:bold;background:#f0f0f0;white-space:nowrap;width:1%;padding-right:6px}
+    .data-table td.val{min-width:80px}
+    .data-table td.lbl-r{font-weight:bold;background:#f0f0f0;white-space:nowrap;text-align:right;padding-right:6px}
+
+    /* ── SECCIONES ── */
+    .section{border:1px solid #000;border-top:none}
+    .sec-title{font-weight:bold;font-size:9px;padding:3px 7px;
+               background:#e0e0e0;border-bottom:1px solid #aaa}
+    .sec-body{padding:6px 7px;min-height:55px;font-size:9.5px;
+              line-height:1.6;white-space:pre-wrap}
+
+    /* ── TABLA TRABAJOS/REPUESTOS ── */
+    .items-wrap{border:1px solid #000;border-top:none}
+    .items-table{width:100%;border-collapse:collapse}
+    .items-table th{background:#1a1a1a;color:#fff;font-size:8.5px;
+                    padding:4px 6px;text-align:left;border:1px solid #555}
+    .items-table th.r{text-align:right}
+    .items-table td{font-size:9px;padding:4px 6px;border:1px solid #ddd;height:18px}
+    .items-table td.r{text-align:right}
+
+    /* ── TOTALES ── */
+    .totals-row{display:flex;justify-content:flex-end;
+                border:1px solid #000;border-top:none;padding:0}
+    .totals-box{width:220px}
+    .t-row{display:flex;justify-content:space-between;
+           padding:3px 8px;font-size:9px;border-bottom:1px solid #ccc}
+    .t-row.final{background:#111;color:#fff;font-weight:bold;font-size:11px;border:none}
+
+    /* ── LEGAL ── */
+    .legal{font-size:6.8px;line-height:1.45;padding:6px 0 4px;
+           color:#444;border-top:1px solid #bbb;margin-top:5px}
+
+    /* ── FIRMAS ── */
+    .firmas{display:grid;grid-template-columns:1fr 1fr 1fr;
+            gap:10px;margin-top:14px;padding-top:8px;border-top:1px solid #000}
+    .firma-blk{text-align:center}
+    .f-line{border-top:1px solid #000;padding-top:3px;margin:0 8px;font-size:8.5px}
+    .f-sub{font-size:7.5px;color:#555;margin-top:2px}
+
+    .no-print{text-align:center;padding:10px}
+    .no-print button{background:#111;color:#fff;border:none;padding:8px 22px;
+                     border-radius:4px;cursor:pointer;font-size:13px}
+    @media print{.no-print{display:none}.page{padding:5mm 7mm}}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button onclick="window.print()">🖨️ Imprimir</button></div>
+
+  <!-- ENCABEZADO -->
+  <div class="header">
+    <div class="h-left">
+      <div class="taller-name">{{ taller.nombre }}</div>
+      <div class="taller-sub">
+        {{ taller.direccion }}<br>
+        TEL:&nbsp;&nbsp; {{ taller.telefono }}<br>
+        {% if taller.get('fax') %}FAX:&nbsp;&nbsp; {{ taller.fax }}{% endif %}
+      </div>
+    </div>
+    <div class="h-mid">
+      <div class="x-box">X</div>
+      <div style="font-size:7.5px;text-align:center;line-height:1.4">No válido<br>como factura</div>
+    </div>
+    <div class="h-right">
+      <div class="pagina">Página: 1/1</div>
+      <div class="doc-no-factura">DOCUMENTO NO VALIDO COMO FACTURA</div>
+      <div class="doc-titulo">ORDEN DE REPARACION</div>
+      <div class="doc-row"><span class="lbl">Nro.:</span><span>0001 – {{ '%08d'|format(orden.id) }}</span></div>
+      <div class="doc-row"><span class="lbl">Fecha:</span><span>{{ orden.fecha_ingreso }}</span></div>
+      <div class="doc-row"><span class="lbl">CUIT:</span><span>{{ taller.cuit }}</span></div>
+      <div class="doc-row"><span class="lbl">Ing. brutos:</span><span>{{ taller.ing_brutos or '—' }}</span></div>
+    </div>
+  </div>
+
+  <div class="iva-bar">IVA &nbsp;–&nbsp; {{ taller.iva }}</div>
+
+  <!-- GRILLA DATOS -->
+  <table class="data-table">
+    <tr>
+      <td class="lbl">Señor/es:</td>
+      <td class="val" colspan="2"><strong>{{ orden.cliente_apellido }}, {{ orden.cliente_nombre2 }}</strong></td>
+      <td class="lbl">Código:</td>
+      <td class="val">{{ orden.cliente_id }}</td>
+      <td class="lbl-r">Fecha de recepción:</td>
+      <td class="val">{{ orden.fecha_ingreso }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Teléfonos:</td>
+      <td class="val" colspan="2">{{ orden.cliente_tel or '' }}</td>
+      <td class="lbl">D.N.I.:</td>
+      <td class="val">{{ orden.cliente_dni or '' }}</td>
+      <td class="lbl-r">Fecha estimada:</td>
+      <td class="val">{{ orden.fecha_estimada or '' }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Domicilio:</td>
+      <td class="val" colspan="2">{{ orden.cliente_dir or '' }}</td>
+      <td class="lbl">IVA:</td>
+      <td class="val">CONSUMIDOR FINAL</td>
+      <td class="lbl-r">Fecha de entrega:</td>
+      <td class="val">{{ orden.fecha_egreso or '' }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">E-mail:</td>
+      <td class="val" colspan="2">{{ orden.cliente_email or '' }}</td>
+      <td class="lbl">Color:</td>
+      <td class="val">{{ orden.color or '' }}</td>
+      <td class="lbl-r" rowspan="2" style="vertical-align:middle">"A cargo de"</td>
+      <td class="val" rowspan="2" style="vertical-align:middle">TODOS</td>
+    </tr>
+    <tr>
+      <td class="lbl">Marca:</td>
+      <td class="val" colspan="2"><strong>{{ orden.marca }}</strong></td>
+      <td class="lbl">Combustible:</td>
+      <td class="val">{{ orden.combustible or '' }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Modelo:</td>
+      <td class="val" colspan="2">{{ orden.modelo }}{% if orden.anio %} {{ orden.anio }}{% endif %}</td>
+      <td class="lbl">Motor:</td>
+      <td class="val">{{ orden.motor or '' }}</td>
+      <td class="lbl-r">Receptor de servicio</td>
+      <td class="val"><strong>{{ orden.receptor_servicio or '' }}</strong></td>
+    </tr>
+    <tr>
+      <td class="lbl">VIN:</td>
+      <td class="val" colspan="2" style="font-family:monospace;font-size:8px">{{ orden.vin or '' }}</td>
+      <td class="lbl">Estado:</td>
+      <td class="val"><strong>{{ orden.estado.upper() }}</strong></td>
+      <td></td><td></td>
+    </tr>
+    <tr>
+      <td class="lbl">Patente:</td>
+      <td class="val" colspan="2"><strong style="font-family:monospace;letter-spacing:2px">{{ orden.patente }}</strong></td>
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <td class="lbl">Kms/Horas:</td>
+      <td class="val" colspan="2">{{ '{:,}'.format(orden.kilometros).replace(',','.')|string + ' Km' if orden.kilometros else '' }}</td>
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <td class="lbl">Observaciones:</td>
+      <td class="val" colspan="6">{{ orden.observaciones or '' }}</td>
+    </tr>
+  </table>
+
+  <!-- DIAGNÓSTICO -->
+  <div class="section" style="margin-top:5px">
+    <div class="sec-title">Manifestación del cliente – Diagnóstico</div>
+    <div class="sec-body">{{ orden.diagnostico or '' }}</div>
+  </div>
+
+  <!-- TRABAJOS -->
+  <div class="section">
+    <div class="sec-title">Trabajo realizado / por realizar</div>
+    <div class="sec-body">{{ orden.descripcion_trabajo or '' }}</div>
+  </div>
+
+  <!-- REPUESTOS -->
+  <div class="items-wrap">
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Repuesto / Material</th>
+          <th class="r" style="width:70px">Cantidad</th>
+          <th class="r" style="width:110px">Precio unit.</th>
+          <th class="r" style="width:110px">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set lines = orden.repuestos.split('\n') if orden.repuestos else [] %}
+        {% for line in lines if line.strip() %}
+        <tr><td>{{ line.strip() }}</td><td></td><td></td><td></td></tr>
+        {% endfor %}
+        {% for _ in range([6 - (lines|selectattr('strip')|list|length), 3]|max) %}
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTALES -->
+  <div class="totals-row">
+    <div class="totals-box">
+      <div class="t-row"><span>Subtotal</span><span>&nbsp;</span></div>
+      <div class="t-row final"><span>TOTAL</span><span>$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+    </div>
+  </div>
+
+  <!-- TEXTO LEGAL -->
+  <div class="legal">
+    Al retirar el vehículo, el cliente declara haber recibido el mismo en perfecto estado y de conformidad con los trabajos realizados indicados en la presente orden.
+    El taller no se responsabiliza por objetos dejados dentro del vehículo ni por daños no relacionados con los trabajos efectuados.
+    Los precios pueden sufrir modificaciones; el precio definitivo será el correspondiente al día de la facturación.
+    El vehículo deberá ser retirado dentro de las 48 hs. de notificado su propietario, caso contrario se cobrará estadía.
+  </div>
+
+  <!-- FIRMAS -->
+  <div class="firmas">
+    <div class="firma-blk">
+      <div class="f-line">Recibido de: ................................</div>
+      <div class="f-sub">Firma y aclaración</div>
+    </div>
+    <div class="firma-blk">
+      <div class="f-line">Entregado a: ................................</div>
+      <div class="f-sub">Firma y aclaración</div>
+    </div>
+    <div class="firma-blk">
+      <div class="f-line">Autoriza: ................................</div>
+      <div class="f-sub">&nbsp;</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

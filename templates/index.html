@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Inicio – Taller Automotriz{% endblock %}
+{% block content %}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h2 class="page-title">
+    <span class="page-title-icon"><i class="bi bi-grid"></i></span>
+    Panel Principal
+  </h2>
+</div>
+
+<!-- STATS -->
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="card" style="padding:18px 20px">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon si-blue"><i class="bi bi-people"></i></div>
+        <div>
+          <div class="stat-label">Clientes</div>
+          <div class="stat-value" style="color:#1d4ed8">{{ stats.clientes }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card" style="padding:18px 20px">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon si-green"><i class="bi bi-car-front"></i></div>
+        <div>
+          <div class="stat-label">Vehículos</div>
+          <div class="stat-value" style="color:#15803d">{{ stats.vehiculos }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card" style="padding:18px 20px">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon si-orange"><i class="bi bi-clipboard2-check"></i></div>
+        <div>
+          <div class="stat-label">Órdenes abiertas</div>
+          <div class="stat-value" style="color:#c2410c">{{ stats.ordenes_abiertas }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card" style="padding:18px 20px">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon si-red"><i class="bi bi-check2-circle"></i></div>
+        <div>
+          <div class="stat-label">Órdenes cerradas</div>
+          <div class="stat-value" style="color:#b91c1c">{{ stats.ordenes_cerradas }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">
+    <a href="/clientes/nuevo" class="qa-card">
+      <div class="qa-icon qi-blue"><i class="bi bi-person-plus"></i></div>
+      <div><div class="qa-title">Nuevo Cliente</div><div class="qa-sub">Registrar cliente</div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="/vehiculos/nuevo" class="qa-card">
+      <div class="qa-icon qi-green"><i class="bi bi-car-front"></i></div>
+      <div><div class="qa-title">Nuevo Vehículo</div><div class="qa-sub">Registrar vehículo</div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="/ordenes/nueva" class="qa-card">
+      <div class="qa-icon qi-orange"><i class="bi bi-clipboard2-plus"></i></div>
+      <div><div class="qa-title">Nueva Orden</div><div class="qa-sub">Abrir orden de trabajo</div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="/presupuestos/nuevo" class="qa-card">
+      <div class="qa-icon qi-teal"><i class="bi bi-receipt"></i></div>
+      <div><div class="qa-title">Nuevo Presupuesto</div><div class="qa-sub">Crear presupuesto</div></div>
+    </a>
+  </div>
+</div>
+
+<!-- ÚLTIMAS ÓRDENES -->
+<div class="card">
+  <div class="card-header"><i class="bi bi-clock-history text-warning"></i> Últimas órdenes</div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr><th>#</th><th>Cliente</th><th>Vehículo</th><th>Ingreso</th><th>Estado</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for o in ordenes_recientes %}
+        <tr>
+          <td class="text-muted">#{{ o.id }}</td>
+          <td class="fw-semibold">{{ o.cliente }}</td>
+          <td>{{ o.vehiculo }}</td>
+          <td>{{ o.fecha_ingreso }}</td>
+          <td><span class="badge-estado badge-{{ o.estado }}">{{ o.estado }}</span></td>
+          <td class="text-end"><a href="/ordenes/{{ o.id }}" class="btn btn-sm btn-outline-secondary">Ver</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">
+          <i class="bi bi-inbox d-block mb-1" style="font-size:24px;opacity:.4"></i>Sin órdenes aún.
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

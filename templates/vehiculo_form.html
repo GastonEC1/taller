@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if vehiculo else 'Nuevo' }} Vehículo{% endblock %}
+{% block content %}
+<div class="page-header mb-3">
+  <div class="row align-items-center">
+    <div class="col-auto"><a href="/vehiculos" class="btn btn-outline-secondary btn-sm"><i class="ti ti-arrow-left me-1"></i>Volver</a></div>
+    <div class="col"><h2 class="page-title mb-0">{{ 'Editar' if vehiculo else 'Nuevo' }} Vehículo</h2></div>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Datos del vehículo</h3></div>
+      <div class="card-body">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Marca *</label>
+              <input type="text" name="marca" class="form-control" required value="{{ vehiculo.marca if vehiculo else '' }}">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Modelo *</label>
+              <input type="text" name="modelo" class="form-control" required value="{{ vehiculo.modelo if vehiculo else '' }}">
+            </div>
+            <div class="col-5">
+              <label class="form-label">Patente *</label>
+              <input type="text" name="patente" class="form-control font-monospace" required
+                     style="text-transform:uppercase;letter-spacing:2px"
+                     value="{{ vehiculo.patente if vehiculo else '' }}">
+            </div>
+            <div class="col-3">
+              <label class="form-label">Año</label>
+              <input type="number" name="anio" class="form-control" min="1900" max="2099" value="{{ vehiculo.anio if vehiculo else '' }}">
+            </div>
+            <div class="col-4">
+              <label class="form-label">Color</label>
+              <input type="text" name="color" class="form-control" value="{{ vehiculo.color if vehiculo else '' }}">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Motor</label>
+              <input type="text" name="motor" class="form-control" placeholder="Ej: 2.8 JTD" value="{{ vehiculo.motor if vehiculo else '' }}">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Combustible</label>
+              <select name="combustible" class="form-select">
+                <option value="">—</option>
+                {% for c in ['Nafta','Diesel','GNC','Híbrido','Eléctrico'] %}
+                <option {{ 'selected' if vehiculo and vehiculo.combustible == c }}>{{ c }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">VIN / Nro. Chasis</label>
+              <input type="text" name="vin" class="form-control font-monospace" value="{{ vehiculo.vin if vehiculo else '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Cliente vinculado</label>
+              <select name="cliente_id" class="form-select">
+                <option value="">— Sin vincular —</option>
+                {% for c in clientes %}
+                <option value="{{ c.id }}" {{ 'selected' if vehiculo and vehiculo.cliente_id == c.id }}>{{ c.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a href="/vehiculos" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
