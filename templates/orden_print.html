@@ -202,11 +202,10 @@
         </tr>
       </thead>
       <tbody>
-        {% set lines = orden.repuestos.split('\n') if orden.repuestos else [] %}
-        {% for line in lines if line.strip() %}
-        <tr><td>{{ line.strip() }}</td><td></td><td></td><td></td></tr>
+        {% for r in repuestos %}
+        <tr><td>{{ r.descripcion }}</td><td class="text-center">{{ r.cantidad }}</td><td></td><td></td></tr>
         {% endfor %}
-        {% for _ in range([6 - (lines|selectattr('strip')|list|length), 3]|max) %}
+        {% for _ in range([6 - repuestos|length, 3]|max) %}
         <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
         {% endfor %}
       </tbody>

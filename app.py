@@ -266,6 +266,15 @@ def _orden_query():
         WHERE o.id=?
     '''
 
+def _save_repuestos(db, orden_id, form):
+    execute(db, 'DELETE FROM orden_repuestos WHERE orden_id=?', (orden_id,))
+    descs = form.getlist('rep_desc')
+    cants = form.getlist('rep_cantidad')
+    for d, c in zip(descs, cants):
+        if d.strip():
+            execute(db, 'INSERT INTO orden_repuestos (orden_id, descripcion, cantidad) VALUES (?,?,?)',
+                    (orden_id, d.strip(), float(c or 1)))
+
 @app.route('/ordenes/nueva', methods=['GET', 'POST'])
 def nueva_orden():
     db = get_db()
@@ -290,25 +299,32 @@ def nueva_orden():
              request.form.get('repuestos','').strip(),
              request.form.get('observaciones','').strip(),
              request.form.get('estado','abierta')))
+        if DATABASE_URL:
+            oid = scalar(db, 'SELECT lastval()')
+        else:
+            oid = db.execute('SELECT last_insert_rowid()').fetchone()[0]
+        _save_repuestos(db, oid, request.form)
         db.commit(); db.close()
         flash('Orden creada.', 'success')
         return redirect(url_for('ordenes'))
     db.close()
-    return render_template('orden_form.html', orden=None, clientes=clientes_list, vehiculos=vehiculos_list)
+    return render_template('orden_form.html', orden=None, clientes=clientes_list, vehiculos=vehiculos_list, repuestos=[])
 
 @app.route('/ordenes/<int:id>')
 def ver_orden(id):
     db = get_db()
     orden = fetchone(db, _orden_query(), (id,))
+    repuestos = fetchall(db, 'SELECT * FROM orden_repuestos WHERE orden_id=? ORDER BY id', (id,))
     db.close()
-    return render_template('orden_detalle.html', orden=orden)
+    return render_template('orden_detalle.html', orden=orden, repuestos=repuestos)
 
 @app.route('/ordenes/<int:id>/imprimir')
 def imprimir_orden(id):
     db = get_db()
     orden = fetchone(db, _orden_query(), (id,))
+    repuestos = fetchall(db, 'SELECT * FROM orden_repuestos WHERE orden_id=? ORDER BY id', (id,))
     db.close()
-    return render_template('orden_print.html', orden=orden, taller=TALLER)
+    return render_template('orden_print.html', orden=orden, repuestos=repuestos, taller=TALLER)
 
 @app.route('/ordenes/<int:id>/editar', methods=['GET', 'POST'])
 def editar_orden(id):
@@ -335,11 +351,13 @@ def editar_orden(id):
              request.form.get('repuestos','').strip(),
              request.form.get('observaciones','').strip(),
              request.form.get('estado','abierta'), id))
+        _save_repuestos(db, id, request.form)
         db.commit(); db.close()
         flash('Orden actualizada.', 'success')
         return redirect(url_for('ver_orden', id=id))
+    repuestos = fetchall(db, 'SELECT * FROM orden_repuestos WHERE orden_id=? ORDER BY id', (id,))
     db.close()
-    return render_template('orden_form.html', orden=orden, clientes=clientes_list, vehiculos=vehiculos_list)
+    return render_template('orden_form.html', orden=orden, clientes=clientes_list, vehiculos=vehiculos_list, repuestos=repuestos)
 
 @app.route('/ordenes/<int:id>/cerrar', methods=['POST'])
 def cerrar_orden(id):

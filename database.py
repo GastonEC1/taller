@@ -76,6 +76,14 @@ if DATABASE_URL:
             )
         ''')
         c.execute('''
+            CREATE TABLE IF NOT EXISTS orden_repuestos (
+                id SERIAL PRIMARY KEY,
+                orden_id INTEGER NOT NULL REFERENCES ordenes(id),
+                descripcion TEXT NOT NULL,
+                cantidad REAL DEFAULT 1
+            )
+        ''')
+        c.execute('''
             CREATE TABLE IF NOT EXISTS presupuesto_items (
                 id SERIAL PRIMARY KEY,
                 presupuesto_id INTEGER NOT NULL REFERENCES presupuestos(id),
@@ -143,6 +151,13 @@ else:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (cliente_id) REFERENCES clientes(id),
                 FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id)
+            );
+            CREATE TABLE IF NOT EXISTS orden_repuestos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                orden_id INTEGER NOT NULL,
+                descripcion TEXT NOT NULL,
+                cantidad REAL DEFAULT 1,
+                FOREIGN KEY (orden_id) REFERENCES ordenes(id)
             );
             CREATE TABLE IF NOT EXISTS presupuesto_items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
