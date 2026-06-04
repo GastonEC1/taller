@@ -134,10 +134,44 @@
 {% endblock %}
 {% block scripts %}
 <script>
-document.getElementById('sel-vehiculo').addEventListener('change', function() {
+const selCliente  = document.getElementById('sel-cliente');
+const selVehiculo = document.getElementById('sel-vehiculo');
+
+// Guardar todas las opciones de vehículos
+const todasOpciones = Array.from(selVehiculo.options);
+
+function filtrarVehiculos() {
+  const cid = selCliente.value;
+  const valorActual = selVehiculo.value;
+
+  // Limpiar y repoblar
+  selVehiculo.innerHTML = '';
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '— Seleccionar —';
+  selVehiculo.appendChild(placeholder);
+
+  todasOpciones.forEach(opt => {
+    if (opt.value === '') return;
+    if (!cid || opt.dataset.cliente === cid) {
+      selVehiculo.appendChild(opt.cloneNode(true));
+    }
+  });
+
+  // Restaurar selección si sigue disponible
+  if (valorActual) selVehiculo.value = valorActual;
+}
+
+selCliente.addEventListener('change', filtrarVehiculos);
+
+// Al elegir vehículo, auto-seleccionar cliente
+selVehiculo.addEventListener('change', function() {
   const cid = this.options[this.selectedIndex].dataset.cliente;
-  if (cid) document.getElementById('sel-cliente').value = cid;
+  if (cid) { selCliente.value = cid; filtrarVehiculos(); }
 });
+
+// Aplicar filtro al cargar si ya hay cliente seleccionado
+filtrarVehiculos();
 
 function addRepRow() {
   const tr = document.createElement('tr');
