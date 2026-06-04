@@ -1,7 +1,9 @@
 import os
 import sqlite3
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('DATABASE_PRIVATE_URL')
+if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
 
 # ─── PostgreSQL (Render) ──────────────────────────────────────────────────────
 if DATABASE_URL:
