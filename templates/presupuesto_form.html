@@ -210,6 +210,11 @@ document.getElementById('btn-add-repuesto').addEventListener('click', () => addR
 // Vincular eventos a ítems existentes
 document.querySelectorAll('#items-body .item-card').forEach(bindCard);
 
+// Agregar mano de obra por defecto si es un presupuesto nuevo
+if (document.querySelectorAll('#items-body .item-card').length === 0) {
+  addRow('mano_de_obra');
+}
+
 // Auto-seleccionar cliente al elegir vehículo
 document.getElementById('sel-vehiculo').addEventListener('change', function() {
   const cid = this.options[this.selectedIndex].dataset.cliente;
