@@ -200,6 +200,9 @@ function addRow(tipo) {
   const clone = tpl.content.cloneNode(true);
   const card = clone.querySelector('.item-card');
   card.querySelector('select[name="item_tipo"]').value = tipo;
+  if (tipo === 'mano_de_obra') {
+    card.querySelector('input[name="item_desc"]').value = 'Mano de obra';
+  }
   bindCard(card);
   document.getElementById('items-body').appendChild(card);
 }
