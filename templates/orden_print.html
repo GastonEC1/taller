@@ -9,20 +9,14 @@
     .page{width:210mm;margin:0 auto;padding:7mm 9mm}
 
     /* ── HEADER ── */
-    .header{display:grid;grid-template-columns:1fr 90px 1fr;border:1px solid #000}
+    .header{display:grid;grid-template-columns:1fr 1fr;border:1px solid #000}
     .h-left{padding:7px 9px;border-right:1px solid #000}
-    .h-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;
-           border-right:1px solid #000;padding:4px;text-align:center}
-    .h-right{padding:7px 9px;position:relative}
-    .pagina{position:absolute;top:4px;right:6px;font-size:8px;color:#555}
-    .taller-name{font-size:12px;font-weight:bold;margin-bottom:3px}
+    .h-right{padding:7px 9px}
+    .taller-name{font-size:13px;font-weight:bold;margin-bottom:3px}
     .taller-sub{font-size:8.5px;line-height:1.6}
-    .x-box{font-size:26px;font-weight:bold;border:1px solid #000;
-           width:38px;height:38px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
-    .doc-no-factura{font-size:9px;font-weight:bold;margin-bottom:2px}
-    .doc-titulo{font-size:11px;font-weight:bold;margin-bottom:5px}
-    .doc-row{display:flex;gap:4px;font-size:8.5px;margin-bottom:2px}
-    .doc-row .lbl{font-weight:bold;min-width:55px}
+    .doc-titulo{font-size:13px;font-weight:bold;margin-bottom:6px;text-align:right}
+    .doc-row{display:flex;justify-content:space-between;font-size:8.5px;margin-bottom:2px}
+    .doc-row .lbl{font-weight:bold}
 
     /* ── IVA BAR ── */
     .iva-bar{text-align:center;font-size:10px;font-weight:bold;
@@ -86,99 +80,75 @@
       <div class="taller-name">{{ taller.nombre }}</div>
       <div class="taller-sub">
         {{ taller.direccion }}<br>
-        TEL:&nbsp;&nbsp; {{ taller.telefono }}<br>
-        {% if taller.get('fax') %}FAX:&nbsp;&nbsp; {{ taller.fax }}{% endif %}
+        {{ taller.ciudad }}<br>
+        Tel: {{ taller.telefono }}
       </div>
     </div>
-    <div class="h-mid">
-      <div class="x-box">X</div>
-      <div style="font-size:7.5px;text-align:center;line-height:1.4">No válido<br>como factura</div>
-    </div>
     <div class="h-right">
-      <div class="pagina">Página: 1/1</div>
-      <div class="doc-no-factura">DOCUMENTO NO VALIDO COMO FACTURA</div>
-      <div class="doc-titulo">ORDEN DE REPARACION</div>
-      <div class="doc-row"><span class="lbl">Nro.:</span><span>0001 – {{ '%08d'|format(orden.id) }}</span></div>
-      <div class="doc-row"><span class="lbl">Fecha:</span><span>{{ orden.fecha_ingreso }}</span></div>
-      <div class="doc-row"><span class="lbl">CUIT:</span><span>{{ taller.cuit }}</span></div>
-      <div class="doc-row"><span class="lbl">Ing. brutos:</span><span>{{ taller.ing_brutos or '—' }}</span></div>
+      <div class="doc-titulo">ORDEN DE TRABAJO</div>
+      <div class="doc-row"><span class="lbl">Nro.:</span><span>#{{ orden.id }}</span></div>
+      <div class="doc-row"><span class="lbl">Fecha ingreso:</span><span>{{ orden.fecha_ingreso }}</span></div>
+      {% if orden.fecha_estimada %}<div class="doc-row"><span class="lbl">Fecha estimada:</span><span>{{ orden.fecha_estimada }}</span></div>{% endif %}
+      {% if orden.fecha_egreso %}<div class="doc-row"><span class="lbl">Fecha egreso:</span><span>{{ orden.fecha_egreso }}</span></div>{% endif %}
+      <div class="doc-row"><span class="lbl">Estado:</span><span><strong>{{ orden.estado.upper() }}</strong></span></div>
     </div>
   </div>
 
   <!-- GRILLA DATOS -->
   <table class="data-table">
     <tr>
-      <td class="lbl">Señor/es:</td>
+      <td class="lbl">Cliente:</td>
       <td class="val" colspan="2"><strong>{{ orden.cliente_apellido }}, {{ orden.cliente_nombre2 }}</strong></td>
-      <td class="lbl">Código:</td>
-      <td class="val">{{ orden.cliente_id }}</td>
-      <td class="lbl-r">Fecha de recepción:</td>
-      <td class="val">{{ orden.fecha_ingreso }}</td>
-    </tr>
-    <tr>
-      <td class="lbl">Teléfonos:</td>
-      <td class="val" colspan="2">{{ orden.cliente_tel or '' }}</td>
-      <td class="lbl">D.N.I.:</td>
-      <td class="val">{{ orden.cliente_dni or '' }}</td>
-      <td class="lbl-r">Fecha estimada:</td>
-      <td class="val">{{ orden.fecha_estimada or '' }}</td>
+      <td class="lbl">Teléfono:</td>
+      <td class="val" colspan="3">{{ orden.cliente_tel or '—' }}</td>
     </tr>
     <tr>
       <td class="lbl">Domicilio:</td>
-      <td class="val" colspan="2">{{ orden.cliente_dir or '' }}</td>
-      <td class="lbl">IVA:</td>
-      <td class="val">CONSUMIDOR FINAL</td>
-      <td class="lbl-r">Fecha de entrega:</td>
-      <td class="val">{{ orden.fecha_egreso or '' }}</td>
+      <td class="val" colspan="2">{{ orden.cliente_dir or '—' }}</td>
+      <td class="lbl">D.N.I.:</td>
+      <td class="val" colspan="3">{{ orden.cliente_dni or '—' }}</td>
     </tr>
+    {% if orden.cliente_email %}
     <tr>
       <td class="lbl">E-mail:</td>
-      <td class="val" colspan="2">{{ orden.cliente_email or '' }}</td>
-      <td class="lbl">Color:</td>
-      <td class="val">{{ orden.color or '' }}</td>
-      <td class="lbl-r" rowspan="2" style="vertical-align:middle">"A cargo de"</td>
-      <td class="val" rowspan="2" style="vertical-align:middle">TODOS</td>
+      <td class="val" colspan="6">{{ orden.cliente_email }}</td>
     </tr>
+    {% endif %}
     <tr>
-      <td class="lbl">Marca:</td>
-      <td class="val" colspan="2"><strong>{{ orden.marca }}</strong></td>
-      <td class="lbl">Combustible:</td>
-      <td class="val">{{ orden.combustible or '' }}</td>
-    </tr>
-    <tr>
-      <td class="lbl">Modelo:</td>
-      <td class="val" colspan="2">{{ orden.modelo }}{% if orden.anio %} {{ orden.anio }}{% endif %}</td>
-      <td class="lbl">Motor:</td>
-      <td class="val">{{ orden.motor or '' }}</td>
-      <td class="lbl-r">Receptor de servicio</td>
-      <td class="val"><strong>{{ orden.receptor_servicio or '' }}</strong></td>
-    </tr>
-    <tr>
-      <td class="lbl">VIN:</td>
-      <td class="val" colspan="2" style="font-family:monospace;font-size:8px">{{ orden.vin or '' }}</td>
-      <td class="lbl">Estado:</td>
-      <td class="val"><strong>{{ orden.estado.upper() }}</strong></td>
-      <td></td><td></td>
-    </tr>
-    <tr>
+      <td class="lbl">Vehículo:</td>
+      <td class="val" colspan="2"><strong>{{ orden.marca }} {{ orden.modelo }}{% if orden.anio %} {{ orden.anio }}{% endif %}</strong></td>
       <td class="lbl">Patente:</td>
-      <td class="val" colspan="2"><strong style="font-family:monospace;letter-spacing:2px">{{ orden.patente }}</strong></td>
-      <td colspan="4"></td>
+      <td class="val" colspan="3"><strong style="font-family:monospace;letter-spacing:2px">{{ orden.patente }}</strong></td>
     </tr>
     <tr>
-      <td class="lbl">Kms/Horas:</td>
-      <td class="val" colspan="2">{{ '{:,}'.format(orden.kilometros).replace(',','.')|string + ' Km' if orden.kilometros else '' }}</td>
-      <td colspan="4"></td>
+      <td class="lbl">Color:</td>
+      <td class="val">{{ orden.color or '—' }}</td>
+      <td class="lbl">Combustible:</td>
+      <td class="val">{{ orden.combustible or '—' }}</td>
+      <td class="lbl">Motor:</td>
+      <td class="val" colspan="2">{{ orden.motor or '—' }}</td>
     </tr>
+    <tr>
+      <td class="lbl">Kilometraje:</td>
+      <td class="val" colspan="2">{{ '{:,}'.format(orden.kilometros).replace(',','.')|string + ' Km' if orden.kilometros else '—' }}</td>
+      {% if orden.receptor_servicio %}
+      <td class="lbl">Receptor:</td>
+      <td class="val" colspan="3">{{ orden.receptor_servicio }}</td>
+      {% else %}
+      <td colspan="4"></td>
+      {% endif %}
+    </tr>
+    {% if orden.observaciones %}
     <tr>
       <td class="lbl">Observaciones:</td>
-      <td class="val" colspan="6">{{ orden.observaciones or '' }}</td>
+      <td class="val" colspan="6">{{ orden.observaciones }}</td>
     </tr>
+    {% endif %}
   </table>
 
   <!-- DIAGNÓSTICO -->
   <div class="section" style="margin-top:5px">
-    <div class="sec-title">Manifestación del cliente – Diagnóstico</div>
+    <div class="sec-title">Diagnóstico / Manifestación del cliente</div>
     <div class="sec-body">{{ orden.diagnostico or '' }}</div>
   </div>
 
@@ -189,58 +159,23 @@
   </div>
 
   <!-- REPUESTOS -->
+  {% if repuestos %}
   <div class="items-wrap">
     <table class="items-table">
       <thead>
         <tr>
           <th>Repuesto / Material</th>
-          <th class="r" style="width:70px">Cantidad</th>
-          <th class="r" style="width:110px">Precio unit.</th>
-          <th class="r" style="width:110px">Total</th>
+          <th class="r" style="width:90px">Cantidad</th>
         </tr>
       </thead>
       <tbody>
         {% for r in repuestos %}
-        <tr><td>{{ r.descripcion }}</td><td class="text-center">{{ r.cantidad }}</td><td></td><td></td></tr>
-        {% endfor %}
-        {% for _ in range([6 - repuestos|length, 3]|max) %}
-        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>{{ r.descripcion }}</td><td class="r">{{ r.cantidad }}</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-
-  <!-- TOTALES -->
-  <div class="totals-row">
-    <div class="totals-box">
-      <div class="t-row"><span>Subtotal</span><span>&nbsp;</span></div>
-      <div class="t-row final"><span>TOTAL</span><span>$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
-    </div>
-  </div>
-
-  <!-- TEXTO LEGAL -->
-  <div class="legal">
-    Al retirar el vehículo, el cliente declara haber recibido el mismo en perfecto estado y de conformidad con los trabajos realizados indicados en la presente orden.
-    El taller no se responsabiliza por objetos dejados dentro del vehículo ni por daños no relacionados con los trabajos efectuados.
-    Los precios pueden sufrir modificaciones; el precio definitivo será el correspondiente al día de la facturación.
-    El vehículo deberá ser retirado dentro de las 48 hs. de notificado su propietario, caso contrario se cobrará estadía.
-  </div>
-
-  <!-- FIRMAS -->
-  <div class="firmas">
-    <div class="firma-blk">
-      <div class="f-line">Recibido de: ................................</div>
-      <div class="f-sub">Firma y aclaración</div>
-    </div>
-    <div class="firma-blk">
-      <div class="f-line">Entregado a: ................................</div>
-      <div class="f-sub">Firma y aclaración</div>
-    </div>
-    <div class="firma-blk">
-      <div class="f-line">Autoriza: ................................</div>
-      <div class="f-sub">&nbsp;</div>
-    </div>
-  </div>
+  {% endif %}
 
 </div>
 </body>

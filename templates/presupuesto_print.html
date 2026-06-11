@@ -86,7 +86,6 @@
       <div class="doc-row"><span>N°:</span><span>0001-{{ '%08d'|format(p.id) }}</span></div>
       <div class="doc-row"><span>Fecha:</span><span>{{ p.fecha }}</span></div>
       <div class="doc-row"><span>CUIT:</span><span>{{ taller.cuit }}</span></div>
-      <div class="doc-row"><span>IVA:</span><span>{{ taller.iva }}</span></div>
     </div>
   </div>
 
@@ -97,7 +96,6 @@
       <div class="data-row"><span class="dr-label">Nombre:</span><span class="dr-value">{{ p.cliente_nombre.split(' ')[0] if p.cliente_nombre else '' }}</span></div>
       <div class="data-row"><span class="dr-label">Domicilio:</span><span class="dr-value">{{ p.cliente_dir or '' }}</span></div>
       <div class="data-row"><span class="dr-label">Teléfono:</span><span class="dr-value">{{ p.cliente_tel or '' }}</span></div>
-      <div class="data-row"><span class="dr-label">IVA:</span><span class="dr-value">CONSUMIDOR FINAL</span></div>
       <div class="data-row"><span class="dr-label">D.N.I.:</span><span class="dr-value">{{ p.cliente_dir or '' }}</span></div>
     </div>
     <div class="data-col">
@@ -154,10 +152,6 @@
     </div>
   </div>
 
-  <!-- FIRMA -->
-  <div class="firma-section">
-    <div class="firma-line">Aceptación (Firma, aclaración y DNI)</div>
-  </div>
 
 </div>
 </body>
