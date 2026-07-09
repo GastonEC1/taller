@@ -47,7 +47,7 @@
     .items-table td.num{text-align:right}
     .items-table td.center{text-align:center}
     .items-table tr:nth-child(even) td{background:#fafafa}
-    .total-row td{background:#111;color:#fff;font-weight:bold;font-size:11px;border-color:#444}
+    .total-row td{background:#f0f0f0;color:#000;font-weight:bold;font-size:11px;border-color:#aaa}
 
     /* ── OBS + VALIDEZ ── */
     .bottom-section{border:1px solid #000;border-top:none;padding:6px 8px}
@@ -113,6 +113,7 @@
     <table class="items-table">
       <thead>
         <tr>
+          <th style="width:90px">Tipo</th>
           <th>Descripción</th>
           <th class="num" style="width:55px">En stock</th>
           <th class="num" style="width:60px">Cantidad</th>
@@ -123,6 +124,7 @@
       <tbody>
         {% for it in items %}
         <tr>
+          <td>{{ 'Mano de obra' if it.tipo == 'mano_de_obra' else ('Repuesto' if it.tipo == 'repuesto' else 'Otro') }}</td>
           <td>{{ it.descripcion }}</td>
           <td class="center">{{ 'Sí' if it.en_stock else 'No' }}</td>
           <td class="num">{{ '{:.2f}'.format(it.cantidad) }}</td>
@@ -131,10 +133,10 @@
         </tr>
         {% endfor %}
         {% for _ in range([5 - items|length, 1]|max) %}
-        <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
         {% endfor %}
         <tr class="total-row">
-          <td colspan="4" style="text-align:right">Total IVA incluido $</td>
+          <td colspan="5" style="text-align:right">Total IVA incluido $</td>
           <td class="num">${{ '{:,.2f}'.format(total).replace(',','.') }}</td>
         </tr>
       </tbody>
