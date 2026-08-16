@@ -275,6 +275,12 @@ def _save_repuestos(db, orden_id, form):
             execute(db, 'INSERT INTO orden_repuestos (orden_id, descripcion, cantidad) VALUES (?,?,?)',
                     (orden_id, d.strip(), float(c or 1)))
 
+def _parse_int(val):
+    try:
+        return int(float(val.replace('.','').replace(',',''))) if val else None
+    except Exception:
+        return None
+
 @app.route('/ordenes/nueva', methods=['GET', 'POST'])
 def nueva_orden():
     db = get_db()
@@ -292,7 +298,7 @@ def nueva_orden():
              request.form['fecha_ingreso'],
              request.form.get('fecha_estimada') or None,
              request.form.get('fecha_egreso') or None,
-             request.form.get('kilometros') or None,
+             _parse_int(request.form.get('kilometros','')),
              request.form.get('receptor_servicio','').strip(),
              request.form.get('descripcion_trabajo','').strip(),
              request.form.get('diagnostico','').strip(),
@@ -344,7 +350,7 @@ def editar_orden(id):
              request.form['fecha_ingreso'],
              request.form.get('fecha_estimada') or None,
              request.form.get('fecha_egreso') or None,
-             request.form.get('kilometros') or None,
+             _parse_int(request.form.get('kilometros','')),
              request.form.get('receptor_servicio','').strip(),
              request.form.get('descripcion_trabajo','').strip(),
              request.form.get('diagnostico','').strip(),
