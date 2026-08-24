@@ -191,65 +191,62 @@
       </div>
 
       <!-- COLUMNA CENTRAL: diagramas auto -->
-      <div style="padding:4px;display:flex;flex-direction:column;gap:4px">
-        <!-- Vista 3/4 frontal -->
-        <svg viewBox="0 0 320 120" width="100%" style="display:block">
-          <!-- Carrocería principal 3/4 -->
-          <g transform="translate(30,10)">
-            <!-- Techo -->
-            <path d="M60 30 Q80 5 140 5 Q190 5 210 20 L230 30" fill="none" stroke="#222" stroke-width="2"/>
-            <!-- Lateral izq -->
-            <path d="M20 65 Q20 45 60 30 L60 72" fill="none" stroke="#222" stroke-width="1.5"/>
-            <!-- Parabrisas frontal -->
-            <path d="M60 30 Q65 32 80 35 L80 55 Q65 55 60 52 Z" fill="none" stroke="#444" stroke-width="1"/>
-            <!-- Ventana trasera -->
-            <path d="M130 20 Q155 18 180 22 L185 30 Q160 28 130 30 Z" fill="none" stroke="#444" stroke-width="1"/>
-            <!-- Capó -->
-            <path d="M20 52 Q30 45 80 42 L80 55 Q30 58 20 65 Z" fill="none" stroke="#222" stroke-width="1.5"/>
-            <!-- Cuerpo lateral izq -->
-            <path d="M20 65 Q18 75 22 85 L220 88 Q228 80 230 70 L230 30 Q210 20 80 35 L60 52 Z" fill="none" stroke="#222" stroke-width="1.5"/>
-            <!-- Rueda delantera -->
-            <ellipse cx="65" cy="88" rx="18" ry="8" fill="none" stroke="#222" stroke-width="2"/>
-            <ellipse cx="65" cy="88" rx="10" ry="5" fill="none" stroke="#555" stroke-width="1"/>
-            <!-- Rueda trasera -->
-            <ellipse cx="195" cy="88" rx="18" ry="8" fill="none" stroke="#222" stroke-width="2"/>
-            <ellipse cx="195" cy="88" rx="10" ry="5" fill="none" stroke="#555" stroke-width="1"/>
-            <!-- Paragolpe frontal -->
-            <path d="M18 68 Q10 72 8 80 L22 82 Q20 75 20 68 Z" fill="none" stroke="#222" stroke-width="1.5"/>
-            <!-- Faro delantero -->
-            <path d="M22 58 Q15 60 12 68 L22 70 Z" fill="none" stroke="#444" stroke-width="1"/>
-            <!-- Faro trasero -->
-            <path d="M228 32 Q235 35 237 45 L230 46 Z" fill="none" stroke="#444" stroke-width="1"/>
-          </g>
+      <div style="padding:4px 6px;display:flex;flex-direction:column;gap:6px">
+
+        <!-- Vista lateral (perfil) -->
+        <div style="font-size:7px;text-align:center;color:#555;margin-bottom:1px">LATERAL</div>
+        <svg viewBox="0 0 260 72" width="100%" style="display:block">
+          <!-- Piso -->
+          <line x1="8" y1="64" x2="252" y2="64" stroke="#222" stroke-width="1.2"/>
+          <!-- Cuerpo inferior (entre ruedas) -->
+          <rect x="38" y="42" width="184" height="18" rx="2" fill="none" stroke="#222" stroke-width="1.5"/>
+          <!-- Capó (delantero) -->
+          <path d="M38 42 L14 48 L12 58 L38 60" fill="none" stroke="#222" stroke-width="1.5"/>
+          <!-- Baúl (trasero) -->
+          <path d="M222 42 L242 46 L244 58 L222 60" fill="none" stroke="#222" stroke-width="1.5"/>
+          <!-- Techo y laterales cabina -->
+          <path d="M62 42 L72 14 L190 14 L208 42" fill="none" stroke="#222" stroke-width="1.5"/>
+          <!-- Línea de cintura -->
+          <line x1="14" y1="48" x2="244" y2="48" stroke="#888" stroke-width="0.8" stroke-dasharray="4,2"/>
+          <!-- Ventana delantera -->
+          <path d="M76 42 L83 18 L120 18 L120 42 Z" fill="none" stroke="#555" stroke-width="1"/>
+          <!-- Ventana central -->
+          <rect x="123" y="18" width="42" height="24" fill="none" stroke="#555" stroke-width="1"/>
+          <!-- Ventana trasera -->
+          <path d="M168 18 L172 18 L200 42 L168 42 Z" fill="none" stroke="#555" stroke-width="1"/>
+          <!-- Rueda delantera -->
+          <circle cx="65" cy="60" r="14" fill="#fff" stroke="#222" stroke-width="1.8"/>
+          <circle cx="65" cy="60" r="7" fill="none" stroke="#888" stroke-width="1"/>
+          <!-- Rueda trasera -->
+          <circle cx="195" cy="60" r="14" fill="#fff" stroke="#222" stroke-width="1.8"/>
+          <circle cx="195" cy="60" r="7" fill="none" stroke="#888" stroke-width="1"/>
+          <!-- Faro delantero -->
+          <rect x="10" y="43" width="6" height="4" rx="1" fill="none" stroke="#666" stroke-width="1"/>
+          <!-- Faro trasero -->
+          <rect x="244" y="43" width="6" height="4" rx="1" fill="none" stroke="#666" stroke-width="1"/>
         </svg>
 
-        <!-- Vista perfil lateral -->
-        <svg viewBox="0 0 320 80" width="100%" style="display:block">
-          <g transform="translate(10,5)">
-            <!-- Carrocería -->
-            <path d="M30 55 Q30 35 65 18 Q100 5 160 5 Q200 5 230 18 Q255 30 265 45 L265 55 Z" fill="none" stroke="#222" stroke-width="2"/>
-            <!-- Línea de cintura -->
-            <path d="M30 38 Q100 30 200 30 Q240 30 265 38" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="3,2"/>
-            <!-- Ventana delantera -->
-            <path d="M70 18 Q85 10 115 8 L115 30 Q85 32 70 38 Z" fill="none" stroke="#444" stroke-width="1"/>
-            <!-- Ventana trasera -->
-            <path d="M118 8 Q150 6 180 8 L185 30 Q150 30 118 30 Z" fill="none" stroke="#444" stroke-width="1"/>
-            <!-- Ventana pequeña trasera -->
-            <path d="M183 10 Q200 8 215 15 L218 30 Q200 30 185 30 Z" fill="none" stroke="#444" stroke-width="1"/>
-            <!-- Rueda delantera -->
-            <circle cx="80" cy="60" r="16" fill="none" stroke="#222" stroke-width="2"/>
-            <circle cx="80" cy="60" r="9" fill="none" stroke="#555" stroke-width="1"/>
-            <!-- Rueda trasera -->
-            <circle cx="215" cy="60" r="16" fill="none" stroke="#222" stroke-width="2"/>
-            <circle cx="215" cy="60" r="9" fill="none" stroke="#555" stroke-width="1"/>
-            <!-- Paragolpe delantero -->
-            <path d="M30 45 Q20 50 18 60 L30 62 Z" fill="none" stroke="#222" stroke-width="1.5"/>
-            <!-- Paragolpe trasero -->
-            <path d="M265 45 Q275 50 277 60 L265 62 Z" fill="none" stroke="#222" stroke-width="1.5"/>
-            <!-- Piso -->
-            <line x1="18" y1="68" x2="277" y2="68" stroke="#222" stroke-width="1.5"/>
-          </g>
+        <!-- Vista superior (planta) -->
+        <div style="font-size:7px;text-align:center;color:#555;margin-bottom:1px">SUPERIOR</div>
+        <svg viewBox="0 0 260 100" width="100%" style="display:block">
+          <!-- Carrocería exterior -->
+          <path d="M50 10 Q130 4 210 10 L224 18 L226 82 L210 90 Q130 96 50 90 L36 82 L34 18 Z" fill="none" stroke="#222" stroke-width="1.8"/>
+          <!-- Cabina (techo) -->
+          <path d="M72 18 Q130 13 188 18 L196 30 L196 70 L188 82 Q130 87 72 82 L64 70 L64 30 Z" fill="none" stroke="#555" stroke-width="1"/>
+          <!-- Parabrisas delantero -->
+          <line x1="64" y1="30" x2="196" y2="30" stroke="#888" stroke-width="0.8"/>
+          <!-- Luneta trasera -->
+          <line x1="64" y1="70" x2="196" y2="70" stroke="#888" stroke-width="0.8"/>
+          <!-- Rueda delantera izq -->
+          <rect x="22" y="12" width="18" height="28" rx="4" fill="#f0f0f0" stroke="#222" stroke-width="1.5"/>
+          <!-- Rueda delantera der -->
+          <rect x="220" y="12" width="18" height="28" rx="4" fill="#f0f0f0" stroke="#222" stroke-width="1.5"/>
+          <!-- Rueda trasera izq -->
+          <rect x="22" y="60" width="18" height="28" rx="4" fill="#f0f0f0" stroke="#222" stroke-width="1.5"/>
+          <!-- Rueda trasera der -->
+          <rect x="220" y="60" width="18" height="28" rx="4" fill="#f0f0f0" stroke="#222" stroke-width="1.5"/>
         </svg>
+
       </div>
 
       <!-- COLUMNA DERECHA -->
