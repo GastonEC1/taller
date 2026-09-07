@@ -58,14 +58,27 @@
     .firma-section{margin-top:20px;padding-top:10px;border-top:1px solid #000;text-align:center}
     .firma-line{border-top:1px solid #000;padding-top:3px;margin:0 auto;width:220px;font-size:9px}
 
-    .no-print{text-align:center;padding:10px}
-    .no-print button{background:#111;color:#fff;border:none;padding:8px 22px;border-radius:4px;cursor:pointer;font-size:13px}
+    .no-print{text-align:center;padding:10px;display:flex;gap:10px;justify-content:center}
+    .no-print button{color:#fff;border:none;padding:8px 22px;border-radius:4px;cursor:pointer;font-size:13px}
+    .btn-print{background:#111}
+    .btn-pdf{background:#c0392b}
     @media print{.no-print{display:none}.page{padding:5mm 8mm}}
   </style>
 </head>
 <body>
 <div class="page">
-  <div class="no-print"><button onclick="window.print()">🖨️ Imprimir</button></div>
+  <div class="no-print">
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    <button class="btn-pdf" onclick="guardarPDF()">⬇️ Guardar PDF</button>
+  </div>
+  <script>
+  function guardarPDF() {
+    const original = document.title;
+    document.title = 'Presupuesto_{{ p.id }}';
+    window.print();
+    document.title = original;
+  }
+  </script>
 
   <!-- HEADER -->
   <div class="header">
