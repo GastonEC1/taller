@@ -525,7 +525,7 @@ def cambiar_estado_presupuesto(id, nuevo_estado):
 def imprimir_presupuesto(id):
     db = get_db()
     p     = fetchone(db, _presup_query(), (id,))
-    items = fetchall(db, 'SELECT * FROM presupuesto_items WHERE presupuesto_id=? ORDER BY tipo, id', (id,))
+    items = fetchall(db, "SELECT * FROM presupuesto_items WHERE presupuesto_id=? ORDER BY CASE tipo WHEN 'mano_de_obra' THEN 1 ELSE 0 END, id", (id,))
     total = sum(i['cantidad'] * i['precio_unitario'] for i in items)
     db.close()
     return render_template('presupuesto_print.html', p=p, items=items, total=total, taller=TALLER)
