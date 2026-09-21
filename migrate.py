@@ -10,6 +10,18 @@ DB_PATH = os.path.join(_dir, 'taller.db')
 conn = sqlite3.connect(DB_PATH)
 c = conn.cursor()
 
+migraciones_tabla = [
+    ("CREATE TABLE IF NOT EXISTS orden_repuestos (id INTEGER PRIMARY KEY AUTOINCREMENT, orden_id INTEGER NOT NULL, descripcion TEXT NOT NULL, cantidad REAL DEFAULT 1, FOREIGN KEY (orden_id) REFERENCES ordenes(id))", "tabla orden_repuestos"),
+    ("CREATE TABLE IF NOT EXISTS orden_fotos (id INTEGER PRIMARY KEY AUTOINCREMENT, orden_id INTEGER NOT NULL, filename TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (orden_id) REFERENCES ordenes(id))", "tabla orden_fotos"),
+]
+
+for sql, nombre in migraciones_tabla:
+    try:
+        c.execute(sql)
+        print(f"  ✓ {nombre}")
+    except sqlite3.OperationalError as e:
+        print(f"  – {nombre}: {e}")
+
 migraciones = [
     # Clientes
     ("ALTER TABLE clientes ADD COLUMN email TEXT",         "clientes.email"),

@@ -96,6 +96,14 @@ if DATABASE_URL:
                 en_stock INTEGER DEFAULT 0
             )
         ''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS orden_fotos (
+                id SERIAL PRIMARY KEY,
+                orden_id INTEGER NOT NULL REFERENCES ordenes(id),
+                filename TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
         conn.commit()
         conn.close()
 
