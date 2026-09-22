@@ -12,7 +12,7 @@ c = conn.cursor()
 
 migraciones_tabla = [
     ("CREATE TABLE IF NOT EXISTS orden_repuestos (id INTEGER PRIMARY KEY AUTOINCREMENT, orden_id INTEGER NOT NULL, descripcion TEXT NOT NULL, cantidad REAL DEFAULT 1, FOREIGN KEY (orden_id) REFERENCES ordenes(id))", "tabla orden_repuestos"),
-    ("CREATE TABLE IF NOT EXISTS orden_fotos (id INTEGER PRIMARY KEY AUTOINCREMENT, orden_id INTEGER NOT NULL, filename TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (orden_id) REFERENCES ordenes(id))", "tabla orden_fotos"),
+    ("CREATE TABLE IF NOT EXISTS orden_fotos (id INTEGER PRIMARY KEY AUTOINCREMENT, orden_id INTEGER NOT NULL, filename TEXT NOT NULL, url TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (orden_id) REFERENCES ordenes(id))", "tabla orden_fotos"),
 ]
 
 for sql, nombre in migraciones_tabla:
@@ -38,6 +38,8 @@ migraciones = [
     ("ALTER TABLE presupuestos ADD COLUMN condicion_venta TEXT", "presupuestos.condicion_venta"),
     # Ítems presupuesto
     ("ALTER TABLE presupuesto_items ADD COLUMN en_stock INTEGER DEFAULT 0", "presupuesto_items.en_stock"),
+    # Fotos orden
+    ("ALTER TABLE orden_fotos ADD COLUMN url TEXT", "orden_fotos.url"),
 ]
 
 for sql, nombre in migraciones:

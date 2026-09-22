@@ -4,12 +4,49 @@ from config import TALLER
 import io, os, uuid
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# ── Cloudinary (si está configurado) o carpeta local ──
+import cloudinary
+import cloudinary.uploader
+
+CLOUDINARY_CONFIGURED = all([
+    os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    os.environ.get('CLOUDINARY_API_KEY'),
+    os.environ.get('CLOUDINARY_API_SECRET'),
+])
+if CLOUDINARY_CONFIGURED:
+    cloudinary.config(
+        cloud_name = os.environ['CLOUDINARY_CLOUD_NAME'],
+        api_key    = os.environ['CLOUDINARY_API_KEY'],
+        api_secret = os.environ['CLOUDINARY_API_SECRET'],
+    )
+else:
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def upload_foto(file):
+    """Sube foto a Cloudinary o localmente. Devuelve (url, public_id_o_filename)."""
+    if CLOUDINARY_CONFIGURED:
+        result = cloudinary.uploader.upload(file, folder='taller_ordenes')
+        return result['secure_url'], result['public_id']
+    else:
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        filename = f"orden_{uuid.uuid4().hex[:8]}.{ext}"
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        return f"/static/uploads/{filename}", filename
+
+def delete_foto(public_id_or_filename):
+    """Elimina foto de Cloudinary o localmente."""
+    if CLOUDINARY_CONFIGURED:
+        cloudinary.uploader.destroy(public_id_or_filename)
+    else:
+        path = os.path.join(UPLOAD_FOLDER, public_id_or_filename)
+        if os.path.exists(path):
+            os.remove(path)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'taller_secreto_2024')
@@ -342,10 +379,8 @@ def subir_foto_orden(id):
     db = get_db()
     for file in files:
         if file and allowed_file(file.filename):
-            ext = file.filename.rsplit('.', 1)[1].lower()
-            filename = f"orden_{id}_{uuid.uuid4().hex[:8]}.{ext}"
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            execute(db, 'INSERT INTO orden_fotos (orden_id, filename) VALUES (?,?)', (id, filename))
+            url, public_id = upload_foto(file)
+            execute(db, 'INSERT INTO orden_fotos (orden_id, filename, url) VALUES (?,?,?)', (id, public_id, url))
     db.commit()
     db.close()
     flash('Foto(s) subida(s) correctamente.', 'success')
@@ -356,9 +391,7 @@ def eliminar_foto_orden(id, foto_id):
     db = get_db()
     foto = fetchone(db, 'SELECT * FROM orden_fotos WHERE id=? AND orden_id=?', (foto_id, id))
     if foto:
-        filepath = os.path.join(UPLOAD_FOLDER, foto['filename'])
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        delete_foto(foto['filename'])
         execute(db, 'DELETE FROM orden_fotos WHERE id=?', (foto_id,))
         db.commit()
     db.close()
